@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2cf5dcf1d25dd774da9cf06756e0e17f, type: 3}
-  m_Name: Ember
+  m_Name: Tail Whip
   m_EditorClassIdentifier: Assembly-CSharp::MoveBase
-  name: Ember
+  name: Tail Whip
   description: 
-  type: 2
-  power: 40
+  type: 1
+  power: 0
   accuracy: 100
-  pp: 25
-  isSpecial: 1
+  pp: 30
+  isSpecial: 0

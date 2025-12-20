@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,6 +8,8 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed;
     public LayerMask solidObjectsLayer;
     public LayerMask grassLayer;
+
+    public event Action OnEncountered;
 
     private bool isMoving;
     private Vector2 inputMovement;
@@ -27,7 +30,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void Update()
+    public void HandleUpdate()
     {
         //If we aren't moving...
         if (!isMoving)
@@ -142,9 +145,10 @@ public class PlayerController : MonoBehaviour
         if (Physics2D.OverlapCircle(transform.position, 0.2f, grassLayer) != null)
         {
             //If we are in the  grass tile, 10% chance of encountering a Pokemon
-            if (Random.Range(1, 101) <= 10)
+            if (UnityEngine.Random.Range(1, 101) <= 10)
             {
-                Debug.Log("Encountered a wild pokemon");
+                animator.SetBool("isMoving", false);
+                OnEncountered();
             }
         }
     }
