@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
+//Script that has list of all Pokemon in user's party
 public class PokemonParty : MonoBehaviour
 {
     [SerializeField] List<Pokemon> pokemons;
@@ -15,6 +16,7 @@ public class PokemonParty : MonoBehaviour
         }
     }
 
+    //Initialize each Pokemon
     private void Start()
     {
         foreach (var pokemon in pokemons)
@@ -23,6 +25,7 @@ public class PokemonParty : MonoBehaviour
         }
     }
 
+    //Return list of all Pokemon that aren't fainted
     public Pokemon GetHealthyPokemon()
     {
         return pokemons.Where(x => x.HP > 0).FirstOrDefault();

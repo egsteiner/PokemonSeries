@@ -143,6 +143,7 @@ public enum PokemonType
     Steel
 }
 
+//Type chart of all type effectiveness
 public class TypeChart
 {
     static float[][] chart =
@@ -167,6 +168,7 @@ public class TypeChart
         /*STE*/ new float [] { 1f, 0.5f,   0.5f,   0.5f, 1f,   2f,   1f,   1f,   1f,   1f,   1f,   1f,   2f,   1f,   1f,   1f,   0.5f  },
     };
 
+    //Return the effectiveness of the move on the Pokemon, can be 0, 0.25,  0.5, 1, 2, 4
     public static float GetEffectiveness(PokemonType attackType, PokemonType defenseType)
     {
         if (attackType == PokemonType.None || defenseType == PokemonType.None) return 1;

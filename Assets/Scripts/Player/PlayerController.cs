@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    // Instead of normal update, have GameController decide which script gets to actively update, so battle and free roam controls don't happen simultaneously
     public void HandleUpdate()
     {
         //If we aren't moving...

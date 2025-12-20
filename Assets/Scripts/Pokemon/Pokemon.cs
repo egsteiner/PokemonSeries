@@ -9,7 +9,7 @@ public class Pokemon
     [SerializeField] PokemonBase _base;
     [SerializeField] int level;
 
-    //Instance of a pokemon has a base generic type that all Pokemon have, and current level, current HP, and the Moves the Pokemon currently knows
+    //Getters for the Base Pokemon stuff and Level
     public PokemonBase Base
     {
         get
@@ -79,7 +79,7 @@ public class Pokemon
         get { return Mathf.FloorToInt((Base.Speed * Level) / 100f) + 5; }
     }
 
-    //Take damage from a move
+    //Take damage from a move. Takes into account critical hits, typing, and physical/special attacks
     public DamageDetails TakeDamage(Move move, Pokemon attacker)
     {
         float critical = 1f;
@@ -121,6 +121,7 @@ public class Pokemon
     }
 }
 
+//Getters for the details in an attack
 public class DamageDetails
 {
     public bool Fainted { get; set; }

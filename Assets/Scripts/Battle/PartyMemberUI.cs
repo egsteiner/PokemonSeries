@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+//Get data for each member of party to display in party screen
 public class PartyMemberUI : MonoBehaviour
 {
     [SerializeField] Text nameText;
@@ -27,6 +28,7 @@ public class PartyMemberUI : MonoBehaviour
         yield return hpBar.SetHPSmooth((float)_pokemon.HP / _pokemon.MaxHp);
     }
 
+    //Highlight the name of the selected pokemon in the party
     public void SetSelected(bool selected)
     {
         if (selected)

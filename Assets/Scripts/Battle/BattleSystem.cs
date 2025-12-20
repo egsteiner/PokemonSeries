@@ -25,6 +25,7 @@ public class BattleSystem : MonoBehaviour
     PokemonParty playerParty;
     Pokemon wildPokemon;
 
+    //Get the player and wild/enemy Pokemon, setup the battle
     public void StartBattle(PokemonParty playerParty, Pokemon wildPokemon)
     {
         this.playerParty = playerParty;
@@ -58,6 +59,7 @@ public class BattleSystem : MonoBehaviour
         dialogBox.EnableActionSelector(true);
     }
 
+    //Opens the party screen window
     void OpenPartyScreen()
     {
         state = BattleState.PartyScreen;
@@ -85,6 +87,7 @@ public class BattleSystem : MonoBehaviour
         move.PP--;
         yield return dialogBox.TypeDialog($"{playerUnit.Pokemon.Base.Name} used {move.Base.Name}");
 
+        // Play the attack animation
         playerUnit.PlayAttackAnimation();
         yield return new WaitForSeconds(1f);
 
@@ -134,6 +137,7 @@ public class BattleSystem : MonoBehaviour
         yield return playerHud.UpdateHP();
         yield return ShowDamageDetails(damageDetails);
 
+        //If player Pokemon fainted, check if any non-fainted Pokemon left in party. If so, let player choose next Pokemon. Otherwise, battle ends
         if (damageDetails.Fainted)
         {
             yield return dialogBox.TypeDialog($"{playerUnit.Pokemon.Base.Name} Fainted");
@@ -155,6 +159,7 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
+    //Messages for type effectiveness
     IEnumerator ShowDamageDetails(DamageDetails damageDetails)
     {
         if (damageDetails.Critical > 1f)
@@ -172,7 +177,7 @@ public class BattleSystem : MonoBehaviour
             yield return dialogBox.TypeDialog("It's not very effective.");
     }
 
-    //If battlestate is PlayerAction or PlayerMove
+    //What to run based on the current Battle State
     public void HandleUpdate()
     {
         if (state == BattleState.PlayerAction)
@@ -203,6 +208,7 @@ public class BattleSystem : MonoBehaviour
         else if (Keyboard.current.upArrowKey.wasPressedThisFrame || Keyboard.current.wKey.wasPressedThisFrame)
             currentAction -= 2;
 
+        // Restricts range from 0 to 3
         currentAction = Mathf.Clamp(currentAction, 0, 3);
 
         dialogBox.UpdateActionSelection(currentAction);
@@ -255,6 +261,8 @@ public class BattleSystem : MonoBehaviour
             dialogBox.EnableDialogText(true);
             StartCoroutine(PerformPlayerMove());
         }
+
+        // If x key is pressed, back out of move selecting and go back to action selection
         else if (Keyboard.current.xKey.wasPressedThisFrame)
         {
             dialogBox.EnableMoveSelector(false);
@@ -279,6 +287,7 @@ public class BattleSystem : MonoBehaviour
 
         partyScreen.UpdateMemberSelection(currentMember);
 
+        //If z pressed, try to switch the Pokemon, unless it's fainted, or the Pokemon currently in battle
         if (Keyboard.current.zKey.wasPressedThisFrame)
         {
             var selectedMember = playerParty.Pokemons[currentMember];
@@ -299,6 +308,7 @@ public class BattleSystem : MonoBehaviour
             StartCoroutine(SwitchPokemon(selectedMember));
 
         }
+        // if x key is preseed, back out of party screen go back to battle screen
         else if (Keyboard.current.xKey.wasPressedThisFrame)
         {
             partyScreen.gameObject.SetActive(false);
@@ -306,6 +316,7 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
+    //Switches the active Pokemon with the parameter new Pokemon
     IEnumerator SwitchPokemon(Pokemon newPokemon)
     {
         if (playerUnit.Pokemon.HP > 0)

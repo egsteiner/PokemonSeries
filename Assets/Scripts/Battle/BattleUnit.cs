@@ -37,6 +37,7 @@ public class BattleUnit : MonoBehaviour
         PlayEnterAnimation();
     }
 
+    // Have Pokemon move into frame when entering
     public void PlayEnterAnimation()
     {
         if (isPlayerUnit)
@@ -47,6 +48,7 @@ public class BattleUnit : MonoBehaviour
         image.transform.DOLocalMoveX(originalPos.x, 1f);
     }
 
+    //Have Pokemon move forward slightly when attacking
     public void PlayAttackAnimation()
     {
         var sequence = DOTween.Sequence();
@@ -59,7 +61,7 @@ public class BattleUnit : MonoBehaviour
     }
 
     
-
+    // Have Pokemon 'flash' when taking damage
     public IEnumerator PlayHitAnimation()
     {
         //var sequence = DOTween.Sequence();
