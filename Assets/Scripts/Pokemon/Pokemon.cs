@@ -1,4 +1,7 @@
+
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 //Classes only visible in inspector if we add this
@@ -30,6 +33,22 @@ public class Pokemon
 
     public List<Move>  Moves { get; set; }
 
+    public Move CurrentMove { get; set; }
+
+    //Dictionary is like a list that stores values, but also store a "key". This way can easily look up value by searching with the key
+    public Dictionary<Stat, int> Stats { get; private set; }
+
+    //Integer value is from -6 to 6, giving the level of Stat boost
+    public Dictionary<Stat, int> StatBoosts { get; private set; }
+    public Condition Status { get; private set; }
+    public int StatusTime { get; set; }
+    public Condition VolatileStatus { get; private set; }
+    public int VolatileStatusTime { get; set; }
+
+    public Queue<string> StatusChanges { get; private set; } = new Queue<string>();
+    public bool HpChanged { get; set; }
+    public event System.Action OnStatusChanged;
+
     //Constructor that sets the Pokemon level, base information/stats and sets current HP to MaxHp
     public void Init()
     {
@@ -46,37 +65,113 @@ public class Pokemon
             if (Moves.Count >= 4)
                 break;
         }
+
+        CalculateStats();
+        HP = MaxHp;
+
+        ResetStatBoost();
+        Status = null;
+        VolatileStatus = null;
+        
+    }
+
+    //Calculate the stats of Pokemon in a dictionary, makes it easier to do stat boosting moves, etc.
+    void CalculateStats()
+    {
+        Stats = new Dictionary<Stat, int>();
+        Stats.Add(Stat.Attack, Mathf.FloorToInt((Base.Attack * Level) / 100f) + 5);
+        Stats.Add(Stat.Defense, Mathf.FloorToInt((Base.Defense * Level) / 100f) + 5);
+        Stats.Add(Stat.SpAttack, Mathf.FloorToInt((Base.SpAttack * Level) / 100f) + 5);
+        Stats.Add(Stat.SpDefense, Mathf.FloorToInt((Base.SpDefense * Level) / 100f) + 5);
+        Stats.Add(Stat.Speed, Mathf.FloorToInt((Base.Speed * Level) / 100f) + 5);
+
+        MaxHp = Mathf.FloorToInt((Base.MaxHp * Level) / 100f) + 10 + Level;
+    }
+
+    //Reset stat boosts after battle
+    void ResetStatBoost()
+    {
+        StatBoosts = new Dictionary<Stat, int>()
+        {
+            {Stat.Attack, 0},
+            {Stat.Defense, 0},
+            {Stat.SpAttack, 0},
+            {Stat.SpDefense, 0},
+            {Stat.Speed, 0},
+            {Stat.Accuracy, 0},
+            { Stat.Evasion, 0}
+        };
+    }
+
+    //Get the stat value of whats being boosted
+    int GetStat(Stat stat)
+    {
+        int statVal = Stats[stat];
+
+        //Apply stat boost
+
+        int boost = StatBoosts[stat];
+        var boostValues = new float[] { 1f, 1.5f, 2f, 2.5f, 3f, 3.5f, 4f};
+
+        if (boost >= 0)
+            statVal = Mathf.FloorToInt(statVal * boostValues[boost]);
+        else
+            statVal = Mathf.FloorToInt(statVal / boostValues[-boost]);
+
+            return statVal;
+    }
+
+    //Apply stat boosts to stats
+
+    public void ApplyBoosts(List<StatBoost> statBoosts)
+    {
+        foreach (var statBoost in statBoosts)
+        {
+            var stat = statBoost.stat;
+            var boost = statBoost.boost;
+
+            StatBoosts[stat] = Mathf.Clamp(StatBoosts[stat] + boost, -6, 6);
+
+            if (boost > 0)
+                StatusChanges.Enqueue($"{Base.Name}'s {stat} rose!");
+            else
+                StatusChanges.Enqueue($"{Base.Name}'s {stat} fell!");
+
+
+
+            Debug.Log($"{stat} has been boosted to {StatBoosts[stat]}");
+        }
     }
 
     //Uses official Pokemon's calculations to determine Pokemon's stats at it's current level based on base stats
     public int Attack
     {
-        get { return Mathf.FloorToInt((Base.Attack * Level) / 100f) + 5; }
+        get { return GetStat(Stat.Attack); }
     }
 
     public int Defense
     {
-        get { return Mathf.FloorToInt((Base.Defense * Level) / 100f) + 5; }
+        get { return GetStat(Stat.Defense); }
     }
 
     public int SpAttack
     {
-        get { return Mathf.FloorToInt((Base.SpAttack * Level) / 100f) + 5; }
+        get { return GetStat(Stat.SpAttack); }
     }
 
     public int SpDefense
     {
-        get { return Mathf.FloorToInt((Base.SpDefense * Level) / 100f) + 5; }
+        get { return GetStat(Stat.SpDefense); }
     }
 
-    public int MaxHp
-    {
-        get { return Mathf.FloorToInt((Base.MaxHp * Level) / 100f) + 10; }
-    }
+    public int MaxHp { get; private set; }
+    
+        
+    
 
     public int Speed
     {
-        get { return Mathf.FloorToInt((Base.Speed * Level) / 100f) + 5; }
+        get { return GetStat(Stat.Speed); }
     }
 
     //Take damage from a move. Takes into account critical hits, typing, and physical/special attacks
@@ -94,32 +189,102 @@ public class Pokemon
             Fainted = false
         };
 
-        float attack = (move.Base.IsSpecial) ? attacker.SpAttack : attacker.Attack;
-        float defense = (move.Base.IsSpecial) ? SpDefense : Defense;
+        float attack = (move.Base.Category == MoveCategory.Special) ? attacker.SpAttack : attacker.Attack;
+        float defense = (move.Base.Category == MoveCategory.Special) ? SpDefense : Defense;
 
         float modifiers = Random.Range(0.85f, 1f) * type * critical;
         float a = (2 * attacker.Level + 10) / 250f;
         float d = a * move.Base.Power * ((float)attack / defense) + 2;
         int damage = Mathf.FloorToInt(d * modifiers);
 
-        HP -= damage;
-        //Return ture if Pokemon fainted, false if not
-        if (HP <= 0)
-        {
-            HP = 0;
-            damageDetails.Fainted = true;
-        }
+        UpdateHP(damage);
 
         return damageDetails;
+    }
+
+    public void UpdateHP(int damage)
+    {
+        HP = Mathf.Clamp(HP - damage, 0, MaxHp);
+        HpChanged = true;
+    }
+    //Sets status of Pokemon
+    public void SetStatus(ConditionID conditionId)
+    {
+        if (Status != null) return;
+
+        Status = ConditionsDB.Conditions[conditionId];
+        //If these status checks are null, it won't crash the game (Ex: Pokemon doesn't have Sleep, therefore OnStart is NULL for this Pokemon
+        Status?.OnStart?.Invoke(this);
+        StatusChanges.Enqueue($"{Base.Name} {Status.StartMessage}");
+        OnStatusChanged?.Invoke();
+    }
+
+    //Cures status, such as sleep or frozen
+    public void CureStatus()
+    {
+        Status = null;
+        OnStatusChanged?.Invoke();
+    }
+
+    public void SetVolatileStatus(ConditionID conditionId)
+    {
+        if (VolatileStatus != null) return;
+
+        VolatileStatus = ConditionsDB.Conditions[conditionId];
+        //If these status checks are null, it won't crash the game (Ex: Pokemon doesn't have Sleep, therefore OnStart is NULL for this Pokemon
+        VolatileStatus?.OnStart?.Invoke(this);
+        StatusChanges.Enqueue($"{Base.Name} {VolatileStatus.StartMessage}");
+        
+    }
+
+    public void CureVolatileStatus()
+    {
+        VolatileStatus = null;
+        
     }
 
     //For enemy Pokemon, have them use a random move they know
     public Move GetRandomMove()
     {
-        int r = Random.Range(0, Moves.Count);
-        return Moves[r];
+        var movesWithPP = Moves.Where(x => x.PP > 0).ToList();
+
+        int r = Random.Range(0, movesWithPP.Count);
+        return movesWithPP[r];
+    }
+    //Before move, if status chance happens, return Status effect
+    public bool OnBeforeMove()
+    {
+        bool canPerformMove = true;
+        if (Status?.OnBeforeMove != null)
+        {
+            if (!Status.OnBeforeMove(this))
+                canPerformMove = false;
+        }
+
+        if (VolatileStatus?.OnBeforeMove != null)
+        {
+            if (!VolatileStatus.OnBeforeMove(this))
+                canPerformMove = false;
+        }
+        return canPerformMove;
+    }
+
+    //After turn, if Status is active after turn, run Status effect
+    public void OnAfterTurn()
+    {
+        //'?' only runs code to the right if it isn't NULL
+        Status?.OnAfterTurn?.Invoke(this);
+        VolatileStatus?.OnAfterTurn?.Invoke(this);
+    }
+    //Reset boosts afta the battle
+    public void OnBattleOver()
+    {
+        VolatileStatus = null;
+        ResetStatBoost();
     }
 }
+
+
 
 //Getters for the details in an attack
 public class DamageDetails

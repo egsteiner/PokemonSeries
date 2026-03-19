@@ -143,6 +143,19 @@ public enum PokemonType
     Steel
 }
 
+public enum Stat
+{
+    Attack,
+    Defense,
+    SpAttack,
+    SpDefense,
+    Speed,
+
+    // These 2 not actual stats, used for boost to moveAccuracy
+    Accuracy,
+    Evasion
+}
+
 //Type chart of all type effectiveness
 public class TypeChart
 {

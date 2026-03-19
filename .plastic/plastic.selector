@@ -1,0 +1,4 @@
+repository "Pokemon Tutorial/PokemonSeries@20067539677953@cloud"
+  path "/"
+    br "/main"
+    co "/main"

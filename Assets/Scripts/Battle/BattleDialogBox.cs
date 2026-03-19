@@ -21,6 +21,7 @@ public class BattleDialogBox : MonoBehaviour
 
     [SerializeField] Color highlightedColor;
 
+    Coroutine typingCoroutine;
 
 
 
@@ -30,8 +31,21 @@ public class BattleDialogBox : MonoBehaviour
         dialogText.text = dialog;
     }
 
-    //Type out the dialog per letter, like in Pokemon games
+    //Make sure only one dialog being typed at a time
     public IEnumerator TypeDialog(string dialog)
+    {
+
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+
+        typingCoroutine = StartCoroutine(TypeText(dialog));
+
+        yield return typingCoroutine;
+        
+    }
+
+    // Type out the dialog line by line
+    private IEnumerator TypeText(string dialog)
     {
         dialogText.text = "";
         foreach (var letter in dialog.ToCharArray())
@@ -41,6 +55,7 @@ public class BattleDialogBox : MonoBehaviour
         }
 
         yield return new WaitForSeconds(1f);
+        typingCoroutine = null;
     }
 
     //Enable/show the Dialog Text(Encounter text)
@@ -89,6 +104,11 @@ public class BattleDialogBox : MonoBehaviour
         //Set the PP and move Type to the move
         ppText.text = $"PP {move.PP} / {move.Base.PP}";
         typeText.text = move.Base.Type.ToString();
+
+        if (move.PP == 0)
+            ppText.color = Color.red;
+        else
+            ppText.color = Color.black;
     }
 
     //Set the names of the moves to the moves the Pokemon knows
