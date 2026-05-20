@@ -12,6 +12,14 @@ public class Pokemon
     [SerializeField] PokemonBase _base;
     [SerializeField] int level;
 
+    public Pokemon(PokemonBase pBase, int pLevel)
+    {
+        _base = pBase;
+        level = pLevel;
+
+        Init();
+    }
+
     //Getters for the Base Pokemon stuff and Level
     public PokemonBase Base
     {
@@ -29,6 +37,8 @@ public class Pokemon
     }
 
     //Quick way of creating property, used when we don't need it displayed in the Unity Inspector
+    public int Exp { get; set; }
+
     public int HP { get; set; }
 
     public List<Move>  Moves { get; set; }
@@ -45,9 +55,9 @@ public class Pokemon
     public Condition VolatileStatus { get; private set; }
     public int VolatileStatusTime { get; set; }
 
-    public Queue<string> StatusChanges { get; private set; } = new Queue<string>();
-    public bool HpChanged { get; set; }
+    public Queue<string> StatusChanges { get; private set; }
     public event System.Action OnStatusChanged;
+    public event System.Action OnHPChanged;
 
     //Constructor that sets the Pokemon level, base information/stats and sets current HP to MaxHp
     public void Init()
@@ -62,17 +72,57 @@ public class Pokemon
             if (move.Level <= Level)
                 Moves.Add(new Move(move.Base));
 
-            if (Moves.Count >= 4)
+            if (Moves.Count >= PokemonBase.MaxNumOfMoves)
                 break;
         }
+
+        Exp = Base.GetExpForLevel(Level);
 
         CalculateStats();
         HP = MaxHp;
 
+        StatusChanges = new Queue<string>();
         ResetStatBoost();
         Status = null;
         VolatileStatus = null;
         
+    }
+
+    public Pokemon(PokemonSaveData saveData)
+    {
+        _base = PokemonDB.GetObjectByName(saveData.name);
+        HP = saveData.hp;
+        level = saveData.level;
+        Exp = saveData.exp;
+
+        if (saveData.statusId != null)
+            Status = ConditionsDB.Conditions[saveData.statusId.Value];
+        else
+            Status = null;
+
+        Moves = saveData.moves.Select(s => new Move(s)).ToList();
+
+
+        CalculateStats();
+        StatusChanges = new Queue<string>();
+        ResetStatBoost();
+        VolatileStatus = null;
+
+    }
+
+    public PokemonSaveData GetSaveData()
+    {
+        var saveData = new PokemonSaveData()
+        {
+            name = Base.name,
+            hp = HP,
+            level = Level,
+            exp = Exp,
+            statusId = Status?.Id,
+            moves = Moves.Select(m => m.GetSaveData()).ToList()
+        };
+
+        return saveData;
     }
 
     //Calculate the stats of Pokemon in a dictionary, makes it easier to do stat boosting moves, etc.
@@ -143,6 +193,35 @@ public class Pokemon
         }
     }
 
+    public bool CheckForLevelUp()
+    {
+        if (Exp > Base.GetExpForLevel(level + 1))
+        {
+            ++level;
+            return true;
+        }
+
+        return false;
+    }
+
+    public LearnableMove GetLearnableMoveAtCurrLevel()
+    {
+        return Base.LearnableMoves.Where(x => x.Level == level).FirstOrDefault();
+    }
+
+    public void LearnMove(MoveBase moveToLearn)
+    {
+        if (Moves.Count > PokemonBase.MaxNumOfMoves)
+            return;
+
+        Moves.Add(new Move(moveToLearn));
+    }
+
+    public bool HasMove(MoveBase moveToCheck)
+    {
+        return Moves.Count(m => m.Base == moveToCheck) > 0;
+    }
+
     //Uses official Pokemon's calculations to determine Pokemon's stats at it's current level based on base stats
     public int Attack
     {
@@ -197,15 +276,23 @@ public class Pokemon
         float d = a * move.Base.Power * ((float)attack / defense) + 2;
         int damage = Mathf.FloorToInt(d * modifiers);
 
-        UpdateHP(damage);
+        DecreaseHP(damage);
 
         return damageDetails;
     }
 
-    public void UpdateHP(int damage)
+    public void IncreaseHP(int amount)
+    {
+        HP = Mathf.Clamp(HP + amount, 0, MaxHp);
+        OnHPChanged?.Invoke();
+        
+    }
+
+    public void DecreaseHP(int damage)
     {
         HP = Mathf.Clamp(HP - damage, 0, MaxHp);
-        HpChanged = true;
+        OnHPChanged?.Invoke();
+        
     }
     //Sets status of Pokemon
     public void SetStatus(ConditionID conditionId)
@@ -294,4 +381,15 @@ public class DamageDetails
     public float Critical { get; set; }
 
     public float TypeEffectiveness { get; set; }
+}
+
+[System.Serializable]
+public class PokemonSaveData
+{
+    public string name;
+    public int hp;
+    public int level;
+    public int exp;
+    public ConditionID? statusId;
+    public List<MoveSaveData> moves;
 }

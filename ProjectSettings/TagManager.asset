@@ -15,11 +15,11 @@ TagManager:
   - 
   - SolidObjects
   - LongGrass
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Interactable
+  - Player
+  - FovLayer
+  - Portal
+  - Triggers
   - 
   - 
   - 
@@ -44,11 +44,23 @@ TagManager:
   - name: Background
     uniqueID: 363597815
     locked: 0
-  - name: Foreground
-    uniqueID: 2143600241
+  - name: Middleground
+    uniqueID: 1835426245
+    locked: 0
+  - name: Obstacles
+    uniqueID: 2242283263
+    locked: 0
+  - name: Grass
+    uniqueID: 3845037843
     locked: 0
   - name: Player
     uniqueID: 3981394045
+    locked: 0
+  - name: Foreground
+    uniqueID: 2143600241
+    locked: 0
+  - name: Battle
+    uniqueID: 211039595
     locked: 0
   m_RenderingLayers:
   - Default

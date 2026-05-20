@@ -2,6 +2,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using Unity.Hierarchy;
+using DG.Tweening;
 
 public class BattleHud : MonoBehaviour
 {
@@ -9,6 +11,7 @@ public class BattleHud : MonoBehaviour
     [SerializeField] Text levelText;
     [SerializeField] Text statusText;
     [SerializeField] HPBar hpBar;
+    [SerializeField] GameObject expBar;
 
     [SerializeField] Color psnColor;
     [SerializeField] Color brnColor;
@@ -24,10 +27,17 @@ public class BattleHud : MonoBehaviour
     //Get the name level and hp of the pokemon, set them to the HUD values in the battle screen
     public void SetData(Pokemon pokemon)
     {
+        if (_pokemon != null)
+        {
+            _pokemon.OnStatusChanged -= SetStatusText;
+            _pokemon.OnHPChanged -= UpdateHP;
+        }
+
         _pokemon = pokemon;
         nameText.text = pokemon.Base.Name;
-        levelText.text = "Lvl " + pokemon.Level;
+        SetLevel();
         hpBar.SetHP((float) pokemon.HP / pokemon.MaxHp);
+        SetExp();
 
         //Colors for each status in the HUD
         statusColors = new Dictionary<ConditionID, Color>()
@@ -41,6 +51,7 @@ public class BattleHud : MonoBehaviour
         };
         SetStatusText();
         _pokemon.OnStatusChanged += SetStatusText;
+        _pokemon.OnHPChanged += UpdateHP;
     }
 
     //Set the status text to nothing if no status, or the status text if a status is active
@@ -57,13 +68,63 @@ public class BattleHud : MonoBehaviour
         }
     }
 
-    //Updates HP Bar after an attack
-    public IEnumerator UpdateHP()
+    public void SetLevel()
     {
-        if (_pokemon.HpChanged)
+        levelText.text = "Lvl " + _pokemon.Level;
+    }
+
+    public void SetExp()
+    {
+        // Enemy hud has no exp, therefore return
+        if (expBar == null) return;
+
+        float normalizedExp = GetNormalizedExp();
+        expBar.transform.localScale = new Vector3(normalizedExp, 1, 1);
+    }
+
+    public IEnumerator SetExpSmooth(bool reset=false)
+    {
+        // Enemy hud has no exp, therefore return
+        if (expBar == null) yield break;
+
+        if (reset)
+            expBar.transform.localScale = new Vector3(0, 1, 1);
+
+        float normalizedExp = GetNormalizedExp();
+        yield return expBar.transform.DOScaleX(normalizedExp, 1.5f).WaitForCompletion();
+    }
+
+    float GetNormalizedExp()
+    {
+        int currLevelExp = _pokemon.Base.GetExpForLevel(_pokemon.Level);
+        int nextLevelExp = _pokemon.Base.GetExpForLevel(_pokemon.Level + 1);
+
+        float normalizedExp = (float)(_pokemon.Exp - currLevelExp) / (nextLevelExp - currLevelExp);
+        return Mathf.Clamp01(normalizedExp);
+    }
+
+    public void UpdateHP()
+    {
+        StartCoroutine(UpdateHPAsync());
+    }
+
+    //Updates HP Bar after an attack
+    public IEnumerator UpdateHPAsync()
+    {
+        yield return hpBar.SetHPSmooth((float)_pokemon.HP / _pokemon.MaxHp);
+    }
+
+    public IEnumerator WaitForHPUpdate()
+    {
+        yield return new WaitUntil(() => hpBar.IsUpdating == false);
+    }
+
+    public void ClearData()
+    {
+        if (_pokemon != null)
         {
-            yield return hpBar.SetHPSmooth((float)_pokemon.HP / _pokemon.MaxHp);
-            _pokemon.HpChanged = false; 
+            _pokemon.OnStatusChanged -= SetStatusText;
+            _pokemon.OnHPChanged -= UpdateHP;
         }
     }
 }

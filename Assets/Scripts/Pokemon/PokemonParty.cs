@@ -2,11 +2,14 @@ using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 //Script that has list of all Pokemon in user's party
 public class PokemonParty : MonoBehaviour
 {
     [SerializeField] List<Pokemon> pokemons;
+
+    public event Action OnUpdated;
 
     public List<Pokemon> Pokemons
     {
@@ -14,10 +17,15 @@ public class PokemonParty : MonoBehaviour
         {
             return pokemons;
         }
+        set
+        {
+            pokemons = value;
+            OnUpdated?.Invoke();
+        }
     }
 
     //Initialize each Pokemon
-    private void Start()
+    private void Awake()
     {
         foreach (var pokemon in pokemons)
         {
@@ -29,5 +37,23 @@ public class PokemonParty : MonoBehaviour
     public Pokemon GetHealthyPokemon()
     {
         return pokemons.Where(x => x.HP > 0).FirstOrDefault();
+    }
+
+    public void AddPokemon(Pokemon newPokemon)
+    {
+        if (pokemons.Count < 6)
+        {
+            pokemons.Add(newPokemon);
+            OnUpdated?.Invoke();
+        }
+        else
+        {
+            // transfer that bih to the pc
+        }
+    }
+
+    public static PokemonParty GetPlayerParty()
+    {
+        return FindFirstObjectByType<PlayerController>().GetComponent<PokemonParty>();
     }
 }

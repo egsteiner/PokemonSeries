@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c21aad2e7d632f64b80a819fcf9f7238, type: 3}
+  m_Name: HM01
+  m_EditorClassIdentifier: Assembly-CSharp::TmItem
+  name: HM01
+  description: Teaches Cut to a pokemon
+  icon: {fileID: 28494502, guid: 3ae12697ae504414bbf0797ea36dfddd, type: 3}
+  move: {fileID: 11400000, guid: 9b9141ca77f63ed4cac71b05b6fcd23a, type: 2}
+  isHM: 1

@@ -8,18 +8,28 @@ public class PartyMemberUI : MonoBehaviour
     [SerializeField] Text nameText;
     [SerializeField] Text levelText;
     [SerializeField] HPBar hpBar;
+    [SerializeField] Text messageText;
 
-    [SerializeField] Color highlightedColor;
 
     Pokemon _pokemon;
 
+
+    
     //Get the name level and hp of the pokemon, set them to the HUD values in the battle screen
-    public void SetData(Pokemon pokemon)
+    public void Init(Pokemon pokemon)
     {
         _pokemon = pokemon;
-        nameText.text = pokemon.Base.Name;
-        levelText.text = "Lvl " + pokemon.Level;
-        hpBar.SetHP((float)pokemon.HP / pokemon.MaxHp);
+        UpdateData();
+
+        _pokemon.OnHPChanged += UpdateData;
+        SetMessage("");
+    }
+
+    void UpdateData()
+    {
+        nameText.text = _pokemon.Base.Name;
+        levelText.text = "Lvl " + _pokemon.Level;
+        hpBar.SetHP((float)_pokemon.HP / _pokemon.MaxHp);
     }
 
     //Updates HP Bar after an attack
@@ -32,8 +42,13 @@ public class PartyMemberUI : MonoBehaviour
     public void SetSelected(bool selected)
     {
         if (selected)
-            nameText.color = highlightedColor;
+            nameText.color = GlobalSettings.i.HighlightedColor;
         else
             nameText.color = Color.black;
+    }
+
+    public void SetMessage(string message)
+    {
+        messageText.text = message;
     }
 }
