@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Collections;
 
 //Script that has list of all Pokemon in user's party
 public class PokemonParty : MonoBehaviour
@@ -49,6 +50,18 @@ public class PokemonParty : MonoBehaviour
         else
         {
             // transfer that bih to the pc
+        }
+    }
+
+    public IEnumerator CheckForEvolutions()
+    {
+        foreach (var pokemon in pokemons)
+        {
+            var evolution = pokemon.CheckForEvolution();
+            if (evolution != null)
+            {
+                yield return EvolutionManager.i.Evolve(pokemon, evolution);
+            }
         }
     }
 

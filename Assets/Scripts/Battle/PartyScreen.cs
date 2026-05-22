@@ -112,7 +112,7 @@ public class PartyScreen : MonoBehaviour
     {
         for (int i = 0; i < pokemons.Count; i++)
         {
-            memberSlots[i].SetMessage("message");
+            memberSlots[i].SetMessage("");
         }
     }
 

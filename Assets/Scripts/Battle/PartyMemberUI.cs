@@ -20,9 +20,8 @@ public class PartyMemberUI : MonoBehaviour
     {
         _pokemon = pokemon;
         UpdateData();
-
-        _pokemon.OnHPChanged += UpdateData;
         SetMessage("");
+        _pokemon.OnHPChanged += UpdateData;
     }
 
     void UpdateData()

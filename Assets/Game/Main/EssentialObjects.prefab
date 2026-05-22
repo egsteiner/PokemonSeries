@@ -1801,6 +1801,7 @@ GameObject:
   - component: {fileID: 3185664092759036213}
   - component: {fileID: 1368791525358692669}
   - component: {fileID: 7054719546578452137}
+  - component: {fileID: 2465281960933803090}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -1926,6 +1927,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96ddb908fa7c729419f05867d9550daf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SavingSystem
+--- !u!114 &2465281960933803090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4996074138662645554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d970129015f62124f82a3c9b51192719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EvolutionManager
+  evolutionUI: {fileID: 3796677959294571977}
+  pokemonImage: {fileID: 8332253557748429833}
 --- !u!1 &5147561797002738618
 GameObject:
   m_ObjectHideFlags: 0
@@ -4560,6 +4575,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 749841678172153857, guid: 6a8073fd7081c434fa97e7fa71dc89c7, type: 3}
   m_PrefabInstance: {fileID: 3220638637751350288}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3796677959294571977 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1730090041807462873, guid: 6a8073fd7081c434fa97e7fa71dc89c7, type: 3}
+  m_PrefabInstance: {fileID: 3220638637751350288}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &5465211829663062769 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7451861936096243425, guid: 6a8073fd7081c434fa97e7fa71dc89c7, type: 3}
@@ -4587,6 +4607,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4227e7db47faef34590b624034f89857, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PartyScreen
+--- !u!114 &8332253557748429833 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6850007683320594457, guid: 6a8073fd7081c434fa97e7fa71dc89c7, type: 3}
+  m_PrefabInstance: {fileID: 3220638637751350288}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1001 &4239144225572687152
 PrefabInstance:
   m_ObjectHideFlags: 0

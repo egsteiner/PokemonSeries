@@ -525,7 +525,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 285994721453512405, guid: f55797cdfc62acb4285d2b73b5b4f9d6, type: 3}
       propertyPath: pokemons.Array.data[0].level
-      value: 14
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 289975799112672111, guid: f55797cdfc62acb4285d2b73b5b4f9d6, type: 3}
       propertyPath: m_AnchorMax.y
@@ -1106,6 +1106,18 @@ PrefabInstance:
     - target: {fileID: 3878536011667786944, guid: f55797cdfc62acb4285d2b73b5b4f9d6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3915040996295369701, guid: f55797cdfc62acb4285d2b73b5b4f9d6, type: 3}
+      propertyPath: slots.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3915040996295369701, guid: f55797cdfc62acb4285d2b73b5b4f9d6, type: 3}
+      propertyPath: slots.Array.data[4].item
+      value: 
+      objectReference: {fileID: 11400000, guid: bcd82f64c2f780547bdbab8356585ae6, type: 2}
+    - target: {fileID: 3915040996295369701, guid: f55797cdfc62acb4285d2b73b5b4f9d6, type: 3}
+      propertyPath: slots.Array.data[4].count
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3984628691618745072, guid: f55797cdfc62acb4285d2b73b5b4f9d6, type: 3}
       propertyPath: m_AnchorMax.y

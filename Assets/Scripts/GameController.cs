@@ -3,7 +3,7 @@ using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public enum GameState { FreeRoam, Battle, Dialog, Cutscene, Paused, Menu, PartyScreen, Bag}
+public enum GameState { FreeRoam, Battle, Dialog, Cutscene, Paused, Menu, PartyScreen, Bag, Evolution}
 
 // Script that controls what gameplay is active (Ex: Free roam vs active battle)
 public class GameController : MonoBehaviour
@@ -17,6 +17,7 @@ public class GameController : MonoBehaviour
 
     GameState state;
     GameState prevState;
+    GameState stateBeforeEvolution;
 
     public SceneDetails CurrentScene { get; private set; }
     public SceneDetails PrevScene { get; private set; }
@@ -64,6 +65,17 @@ public class GameController : MonoBehaviour
         };
 
         menuController.onMenuSelected += OnMenuSelected;
+
+        EvolutionManager.i.OnStartEvolution += () =>
+        {
+            stateBeforeEvolution = state;
+            state = GameState.Evolution;
+        };
+        EvolutionManager.i.OnCompleteEvolution += () =>
+        {
+            partyScreen.SetPartyData();
+            state = stateBeforeEvolution;
+        };
     }
 
     public void PauseGame(bool pause)
@@ -124,9 +136,14 @@ public class GameController : MonoBehaviour
             trainer = null;
         }
 
+        partyScreen.SetPartyData();
+
         state = GameState.FreeRoam;
         battleSystem.gameObject.SetActive(false);
         worldCamera.gameObject.SetActive(true);
+
+        var playerParty = playerController.GetComponent<PokemonParty>();
+        StartCoroutine(playerParty.CheckForEvolutions());
     }
 
     // If Game State is switched to FreeRoam, PlayerController script constantly updates, if Game State is Battle, BattleSystem script constantly updates instead

@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 889c4d028f68ca342be681979be858b2, type: 3}
-  m_Name: Charmander
+  m_Name: Charizard
   m_EditorClassIdentifier: Assembly-CSharp::PokemonBase
-  name: Charmander
+  name: Charmeleon
   description: 
-  frontSprite: {fileID: 21300000, guid: cd259d9d4f8ba2749a16d1cc64d46bec, type: 3}
-  backSprite: {fileID: 21300000, guid: ed8e1d9976a1fd94d961840d8f6e7764, type: 3}
+  frontSprite: {fileID: 21300000, guid: d819d29c71518d340b52028b17af51c2, type: 3}
+  backSprite: {fileID: 21300000, guid: 4e7023cd378451d4d80b1c653bb62ff7, type: 3}
   type1: 2
-  type2: 0
-  maxHp: 39
-  attack: 52
-  defense: 43
-  spAttack: 60
-  spDefense: 50
-  speed: 65
-  expYield: 1062
+  type2: 10
+  maxHp: 78
+  attack: 84
+  defense: 78
+  spAttack: 109
+  spDefense: 85
+  speed: 100
+  expYield: 267
   growthRate: 3
   catchRate: 255
   learnableMoves:
@@ -43,7 +43,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 64d1f0be5bb82bb4e8ff7bef937e02e1, type: 2}
   - {fileID: 11400000, guid: 61b27f6c887f383478bb49a4aed4f931, type: 2}
   - {fileID: 11400000, guid: 24644e37a0b71b849b721e5dfd88523b, type: 2}
-  evolutions:
-  - evolvesInto: {fileID: 11400000, guid: 2c4868f07f4f95e449020a2793c8f1a9, type: 2}
-    requiredLevel: 16
-    requiredItem: {fileID: 11400000, guid: bcd82f64c2f780547bdbab8356585ae6, type: 2}
+  evolutions: []
